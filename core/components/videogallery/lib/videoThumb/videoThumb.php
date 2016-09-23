@@ -49,8 +49,21 @@ class videoThumb
         // YouTube
         if (preg_match('/[http|https]+:\/\/(?:www\.|)youtube\.com\/watch\?(?:.*)?v=([a-zA-Z0-9_\-]+)/i', $video, $matches) || preg_match('/[http|https]+:\/\/(?:www\.|)youtube\.com\/embed\/([a-zA-Z0-9_\-]+)/i', $video, $matches) || preg_match('/[http|https]+:\/\/(?:www\.|)youtu\.be\/([a-zA-Z0-9_\-]+)/i', $video, $matches)) {
             $video = 'http://www.youtube.com/embed/'.$matches[1];
-            $image = 'http://img.youtube.com/vi/'.$matches[1].'/maxresdefault.jpg';
+            $resolution = array (
+                'maxresdefault',
+                'sddefault',
+                'mqdefault',
+                'hqdefault',
+                'default'
+            );
 
+            for ($x = 0; $x < sizeof($resolution); $x++) {
+                $image = 'http://img.youtube.com/vi/' . $matches[1] . '/' . $resolution[$x] . '.jpg';
+                if (get_headers($image)[0] == 'HTTP/1.0 200 OK') {
+                    break;
+                }
+            }
+            
             $array = array(
                 'video' => $video, 'videoId' => $matches[1], 'image' => $this->getRemoteImage($image),
             );
